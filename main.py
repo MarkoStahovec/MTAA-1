@@ -1,13 +1,8 @@
-from sip import socketserver
-from sip import UDPHandler
-from sip import socket
-from sip import logging
-
-HOST, PORT = '', 5060
-
-
-def handle():
-    pass
+import sip
+import logging
+import socket
+import socketserver
+import sys
 
 
 if __name__ == "__main__":
@@ -18,11 +13,16 @@ if __name__ == "__main__":
     s.connect(('8.8.8.8', 1))  # connect to google's dns and extract self private IP, just for printing purposes
 
     HOST = s.getsockname()[0]
-    print(f"Server Address: {s.getsockname()[0]}:{PORT}")
-    s.shutdown(socket.SHUT_RDWR)  # terminate socket
+    print(f"Server Address: {s.getsockname()[0]}:{sip.PORT}\nServer is running...")
     s.close()
 
     logging.info("Server: %s", HOST)
 
-    server = socketserver.UDPServer((HOST, PORT), UDPHandler)
+    if HOST == "127.0.0.1":
+        HOST = sys.argv[1]
+
+    sip.recordroute = "Record-Route: <sip:%s:%d;lr>" % (HOST, sip.PORT)
+    sip.topvia = "Via: SIP/2.0/UDP %s:%d" % (HOST, sip.PORT)
+    server = socketserver.UDPServer((HOST, sip.PORT), sip.UDPHandler)
     server.serve_forever()
+

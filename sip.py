@@ -303,6 +303,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             return
         destination = self.getDestination()
         if len(destination) > 0:
+
+            if origin.decode() not in callers:
+                callers.append(origin.decode())
+            if destination.decode() not in callers:
+                callers.append(destination.decode())
+
             logging.info("Pre adresu: %s" % destination)
             if destination in registrar and self.checkValidity(destination):
                 socket, claddr = self.getSocketInfo(destination)
@@ -338,7 +344,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 # insert Record-Route
                 data.insert(1, recordroute.encode())
                 text = b"\r\n".join(data)
-                # text = string.join(data, "\r\n")
+
                 socket.sendto(text, claddr)
                 showtime()
                 logging.info("<<< %s" % data[0])
@@ -363,7 +369,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 # insert Record-Route
                 data.insert(1, recordroute.encode())
                 text = b"\r\n".join(data)
-                # text = string.join(data, "\r\n")
+
                 socket.sendto(text, claddr)
                 showtime()
                 logging.info("<<< %s" % data[0])
@@ -391,18 +397,18 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 logging.info("<<< %s" % data[0])
                 logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
-                if rx_ringing.search(data[0]) and origin.decode() not in callers:
-                    callers.append(origin.decode())
+                #if rx_ringing.search(data[0]) and origin.decode() not in callers:
+                #    callers.append(origin.decode())
 
-                    """
+                """
                     for k, v in registrar.items():
                         if k.decode() not in callers:
                             callers.append(k.decode())
-                    """
+                """
 
-                destination = self.getDestination()
-                if rx_ringing.search(data[0]) and destination.decode() not in callers:
-                    callers.append(destination.decode())
+                #destination = self.getDestination()
+                #if rx_ringing.search(data[0]) and destination.decode() not in callers:
+                #    callers.append(destination.decode())
 
                 if rx_ok.search(data[0]) and len(callers) >= 2:
                     if not calling:
@@ -429,7 +435,6 @@ class UDPHandler(socketserver.BaseRequestHandler):
                     callers.remove(origin.decode())
 
     def processRequest(self):
-        # print "processRequest"
         if len(self.data) > 0:
             request_uri = self.data[0]
             if rx_register.search(request_uri):
@@ -488,25 +493,25 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 logging.warning("---")
                 """
 
-
+"""
 if __name__ == "__main__":
-
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', filename='proxy.log', level=logging.INFO,
                         datefmt='%H:%M:%S')
 
-    logging.info(time.strftime("%a, %d %b %Y %H:%M:%S ", time.localtime()))
-    hostname = socket.gethostname()
-    logging.info(hostname)
-    ipaddress = socket.gethostbyname(hostname)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 1))  # connect to google's dns and extract self private IP, just for printing purposes
 
-    if ipaddress == "127.0.0.1":
-        ipaddress = sys.argv[1]
+    HOST = s.getsockname()[0]
+    print(f"Server Address: {s.getsockname()[0]}:{PORT}\nServer is running...")
+    s.close()
 
-    logging.info(ipaddress)
+    logging.info("Server: %s", HOST)
 
-    hostname = socket.gethostname()
-    ipaddress = socket.gethostbyname(hostname)
-    recordroute = "Record-Route: <sip:%s:%d;lr>" % (ipaddress, PORT)
-    topvia = "Via: SIP/2.0/UDP %s:%d" % (ipaddress, PORT)
+    if HOST == "127.0.0.1":
+        HOST = sys.argv[1]
+
+    recordroute = "Record-Route: <sip:%s:%d;lr>" % (HOST, PORT)
+    topvia = "Via: SIP/2.0/UDP %s:%d" % (HOST, PORT)
     server = socketserver.UDPServer((HOST, PORT), UDPHandler)
     server.serve_forever()
+"""
