@@ -91,17 +91,20 @@ def quotechars(chars):
     return ''.join(['.', c][c.isalnum()] for c in chars)
 
 
+"""
 def showtime():
     logging.debug(time.strftime("(%H:%M:%S)", time.localtime()))
+"""
 
 
 class UDPHandler(socketserver.BaseRequestHandler):
     def debugRegister(self):
-        logging.debug("*** REGISTER ***")
-        logging.debug("*****************")
+        # logging.debug("*** REGISTER ***")
+        # logging.debug("*****************")
         for key in registrar.keys():
-            logging.debug("%s -> %s" % (key, registrar[key][0]))
-        logging.debug("*****************")
+            pass
+            # logging.debug("%s -> %s" % (key, registrar[key][0]))
+        # logging.debug("*****************")
 
     def changeRequestUri(self):
         # change request uri
@@ -164,7 +167,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             return True
         else:
             del registrar[uri]
-            logging.warning("Registracia pre %s vyprsala" % uri)
+            # logging.warning("Registracia pre %s vyprsala" % uri)
             return False
 
     def getSocketInfo(self, uri):
@@ -227,9 +230,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
 
         text = b"\r\n".join(data)
         self.socket.sendto(text, self.client_address)
-        showtime()
-        logging.info("<<< %s" % data[0])
-        logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
+        # showtime()
+        # logging.info("<<< %s" % data[0])
+        # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
     def processRegister(self):
         fromm = None
@@ -282,9 +285,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
             now = int(time.time())
             validity = now + expires
 
-        logging.info("Od: %s - Pre: %s" % (fromm, contact))
-        logging.debug("Z Adresy: %s:%s" % self.client_address)
-        logging.debug("Vyprsi o %d sekund" % expires)
+        # logging.info("Od: %s - Pre: %s" % (fromm, contact))
+        # logging.debug("Z Adresy: %s:%s" % self.client_address)
+        # logging.debug("Vyprsi o %d sekund" % expires)
         registrar[fromm] = [contact, self.socket, self.client_address, validity]
 
         with open(history, "a+") as file:
@@ -294,9 +297,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         self.sendResponse("200 0K")
 
     def processInvite(self):
-        logging.debug("-----------------")
-        logging.debug(" INVITE ")
-        logging.debug("-----------------")
+        # logging.debug("-----------------")
+        # logging.debug(" INVITE ")
+        # logging.debug("-----------------")
         origin = self.getOrigin()
         if len(origin) == 0 or origin not in registrar:
             self.sendResponse("400 Zla poziadavka")
@@ -309,7 +312,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             if destination.decode() not in callers:
                 callers.append(destination.decode())
 
-            logging.info("Pre adresu: %s" % destination)
+            # logging.info("Pre adresu: %s" % destination)
             if destination in registrar and self.checkValidity(destination):
                 socket, claddr = self.getSocketInfo(destination)
                 # self.changeRequestUri()
@@ -320,9 +323,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 text = b"\r\n".join(data)
                 # text = string.join(data, "\r\n")
                 socket.sendto(text, claddr)
-                showtime()
-                logging.info("<<< %s" % data[0])
-                logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
+                # showtime()
+                # logging.info("<<< %s" % data[0])
+                # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
             else:
                 self.sendResponse("480 Docasne nedostupne")
@@ -330,12 +333,12 @@ class UDPHandler(socketserver.BaseRequestHandler):
             self.sendResponse("500 Chyba na strane servera")
 
     def processAck(self):
-        logging.debug("--------------")
-        logging.debug(" ACK ")
-        logging.debug("--------------")
+        # logging.debug("--------------")
+        # logging.debug(" ACK ")
+        # logging.debug("--------------")
         destination = self.getDestination()
         if len(destination) > 0:
-            logging.info("Pre adresu: %s" % destination)
+            # logging.info("Pre adresu: %s" % destination)
             if destination in registrar:
                 socket, claddr = self.getSocketInfo(destination)
                 # self.changeRequestUri()
@@ -346,21 +349,21 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 text = b"\r\n".join(data)
 
                 socket.sendto(text, claddr)
-                showtime()
-                logging.info("<<< %s" % data[0])
-                logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
+                # showtime()
+                # logging.info("<<< %s" % data[0])
+                # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
     def processNonInvite(self):
-        logging.debug("----------------------")
-        logging.debug(" NonInvite ")
-        logging.debug("----------------------")
+        # logging.debug("----------------------")
+        # logging.debug(" NonInvite ")
+        # logging.debug("----------------------")
         origin = self.getOrigin()
         if len(origin) == 0 or not origin in registrar:
             self.sendResponse("400 Nespravna poziadavka")
             return
         destination = self.getDestination()
         if len(destination) > 0:
-            logging.info("Pre adresu: %s" % destination)
+            # logging.info("Pre adresu: %s" % destination)
             if destination in registrar and self.checkValidity(destination):
                 socket, claddr = self.getSocketInfo(destination)
                 # self.changeRequestUri()
@@ -371,9 +374,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 text = b"\r\n".join(data)
 
                 socket.sendto(text, claddr)
-                showtime()
-                logging.info("<<< %s" % data[0])
-                logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
+                # showtime()
+                #logging.info("<<< %s" % data[0])
+                # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
             else:
                 self.sendResponse("406 Nespravna adresa")
@@ -385,7 +388,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
         origin = self.getOrigin()
         caller_list = ''
         if len(origin) > 0:
-            logging.debug("Od: %s" % origin)
+            # logging.debug("Od: %s" % origin)
             if origin in registrar:
                 socket, claddr = self.getSocketInfo(origin)
                 self.data = self.removeRouteHeader()
@@ -393,9 +396,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 text = b"\r\n".join(data)
                 # text = string.join(data, "\r\n")
                 socket.sendto(text, claddr)
-                showtime()
-                logging.info("<<< %s" % data[0])
-                logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
+                # showtime()
+                # logging.info("<<< %s" % data[0])
+                # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
 
                 #if rx_ringing.search(data[0]) and origin.decode() not in callers:
                 #    callers.append(origin.decode())
@@ -468,7 +471,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
             elif rx_code.search(request_uri):
                 self.processCode()
             else:
-                logging.error("request_uri %s" % request_uri)
+                print("Chybný Request URI")
+                # logging.error("request_uri %s" % request_uri)
                 # print "message %s unknown" % self.data
 
     def handle(self):
@@ -478,16 +482,17 @@ class UDPHandler(socketserver.BaseRequestHandler):
         self.socket = self.request[1]
         request_uri = self.data[0]
         if rx_request_uri.search(request_uri) or rx_code.search(request_uri):
-            showtime()
-            logging.info(">>> %s" % request_uri)
-            logging.debug("---\n>> server prijal [%d]:\n%s\n---" % (len(data), data))
-            logging.debug("Z adresy %s:%d" % self.client_address)
+            # showtime()
+            # logging.info(">>> %s" % request_uri)
+            # logging.debug("---\n>> server prijal [%d]:\n%s\n---" % (len(data), data))
+            # logging.debug("Z adresy %s:%d" % self.client_address)
             self.processRequest()
 
         else:
             if len(data) > 4:
-                showtime()
-                logging.info("---\n>> server received [%d]:" % len(data))
+                pass
+                # showtime()
+                # logging.info("---\n>> server received [%d]:" % len(data))
                 """
                 hexdump(data, ' ', 16)
                 logging.warning("---")

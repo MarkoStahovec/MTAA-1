@@ -4,10 +4,12 @@ import socket
 import socketserver
 import sys
 
+# sip traces na git a link ponechat v dokumentacii
+
 
 if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', filename='proxy.log', level=logging.INFO,
-                        datefmt='%H:%M:%S')
+    # logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', filename='proxy.log', level=logging.INFO,
+    #                    datefmt='%H:%M:%S')
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(('8.8.8.8', 1))  # connect to google's dns and extract self private IP, just for printing purposes
