@@ -393,15 +393,18 @@ class UDPHandler(socketserver.BaseRequestHandler):
                 socket, claddr = self.getSocketInfo(origin)
                 self.data = self.removeRouteHeader()
                 data = self.removeTopVia()
+
+                if rx_ringing.search(data[0]):
+                    data[0] = data[0].decode().replace("Ringing", "Zvoni").encode()
+                if rx_trying.search(data[0]):
+                    data[0] = data[0].decode().replace("Trying", "Skusa nadviazat spojenie").encode()
+
                 text = b"\r\n".join(data)
                 # text = string.join(data, "\r\n")
                 socket.sendto(text, claddr)
                 # showtime()
                 # logging.info("<<< %s" % data[0])
                 # logging.debug("---\n<< server odoslal [%d]:\n%s\n---" % (len(text), text))
-
-                #if rx_ringing.search(data[0]) and origin.decode() not in callers:
-                #    callers.append(origin.decode())
 
                 """
                     for k, v in registrar.items():
